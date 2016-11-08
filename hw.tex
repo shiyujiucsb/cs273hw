@@ -1,0 +1,187 @@
+\documentclass{article}
+\usepackage{graphicx,tikz}
+\usepackage{fullpage}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+
+\begin{document}
+\title{\bf CS 273 Homework}
+\author{Shiyu Ji}
+\date{}
+\maketitle
+
+\section{Problem A}
+Your task is to design a database for Amazon that sells books.
+The following is the description of the application.
+\begin{itemize}
+\item Each book has a name and a publisher.
+\item Each book has many versions. Each version has a version number, the year and date it was first published, and the authors.
+\item Registered viewers can rate any version of a book. For each rate, we want to record its post date and rate.
+\item For each registered viewer, we want to record his/her userID and password.
+\end{itemize}
+If you do not have sufficient information, please state your assumptions clearly.
+
+(a) Draw an ER diagram for this application. Be sure to mark the multiplicity of each relationship of the diagram. Decide the key attributes and identify them on the diagram.
+
+(b) Convert the above ER diagram into a relational schema. Merge relations where appropriate. Your solution should have as few relations as possible, but they do not need to be normalized. Specify they key of each relation in your schema.
+
+(c) Write a 3NF for the derived relational schema.
+
+\section{Problem B}
+The following questions refer to the database schema below: Product(pid, price, color), Order(cid, pid, quantity), Customer(cid, name, age).
+
+(a) Write a query, in Relational Algebra, to return the names of customers who order at least one product with color ``Yellow''.
+
+{\bf Answer}: $$\pi_{\texttt{name}} (\texttt{Customer} \bowtie \texttt{Order} \bowtie \sigma_{\texttt{color} = \texttt{Yellow}}(\texttt{Product})).$$
+
+(b) Write a query in Tuple Relational Calculus and Domain Relational Calculus, to return the product with the highest price.
+
+(c) Write an SQL query, to return the total quantity of products ordered by customers with age greater than 50.
+
+{\bf Answer}:
+\begin{verbatim}
+select SUM(quantity)
+from Order
+where cid in (
+    select cid
+    from Customer
+    where age > 50
+);
+\end{verbatim}
+
+(d) Write an SQL query, to return the pid(s) of the most ordered product(s) (i.e. the product(s) with the highest total ordered quantities).
+
+{\bf Answer}: 
+\begin{verbatim}
+select pid
+from Product
+where pid in (
+  select pid
+  from (
+    select pid, SUM(quantity) as QuantitySum
+    from Order
+    group by pid
+  )
+  where QuantitySum in (
+    select MAX(QuantitySum)
+    from (
+      select Sum(quantity) as QuantitySum
+      from Order
+      group by pid
+    )
+  )
+);
+\end{verbatim}
+
+\section{Problem C}
+We have an employee database with three tables. The Employee table stores information about employees. Every employee is identified by an {\bf EmployeeID}. The Department table stores information about each department. The Vacations table stores information about the total number of days each employee takes for vacation.
+\begin{itemize}
+\item Employee(\underline{EmployeeID}, FirstName, LastName, Office, Email, DepartmentID)
+\item Department(\underline{DepartmentID}, DepartmentName)
+\item Vacations(\underline{EmployeeID}, Days)
+\end{itemize}
+
+Answer the following queries using SQL and write its corresponding TRC if exists.
+
+a) List the Office and Email of employee ``John Smith''.
+
+{\bf Answer}: 
+\begin{verbatim}
+select Office, Email
+from Employee
+where FirstName = 'John' and LastName = 'Smith';
+\end{verbatim}
+
+b) List the number of vacation Days taken by each employee with the name ``John Smith''.
+
+{\bf Answer}:
+\begin{verbatim}
+select Days
+from Vacations
+where EmployeeID in (
+  select EmployeeID
+  from Employee
+  where FirstName = 'John' and LastName = 'Smith'
+);
+\end{verbatim}
+
+c) List the FirstName and LastName of all employees who never took a vacation day.
+
+{\bf Answer}:
+\begin{verbatim}
+select FirstName, LastName
+from Employee
+where EmployeeID in (
+  select EmployeeID
+  from Vacations
+  where Days = 0;
+);
+\end{verbatim}
+
+d) List the DepartmentName of every department whose total number of vacation days taken by its employees is the largest among those of all the departments.
+
+{\bf Answer}:
+\begin{verbatim}
+select DepartmentName
+from Department
+where DepartmentID in (
+  select DepartmentID
+  from (
+    select DepartmentID, SUM(Days) as DaySum
+    from Employee inner join Vacations
+    on Employee.EmployeeID = Vacations.EmployeeID
+    group by DepartmentID
+  )
+  where DaySum in (
+    select MAX(DaySum)
+    from (
+      select SUM(Days) as DaySum
+      from Employee inner join Vacations
+      on Employee.EmployeeID = Vacations.EmployeeID
+      group by DepartmentID
+    )
+  )
+);
+\end{verbatim}
+
+\section{Problem D}
+We perform decomposition to normalize an original schema to be of certain normal forms. For such a decomposition to be ``equivalent'' to the original schema, it is desirable to be lossless. To study this concept, let us consider an original schema $R(A, B, C)$. Suppose we decompose $R$ into $R_1 (A, B)$ and $R_2 (B, C)$.
+
+(a) Is this decomposition always lossless? Answer yes or no and briefly explain why.
+
+{\bf Answer}: No. Suppose two tuples have the same value of $B$ but different values of $A$ and $C$. Then the decomposed tuples in $R_1$ and $R_2$ give 4 possible combinations, implying it is impossible to recover the original schema.
+
+(b) Give an example instance of $R$ (i.e. an example table with several tuples) and demonstrate its decomposition, to support your answer in (a).
+
+{\bf Answer}: A ``lossy'' relation $R$ can given as follows:
+
+\begin{tabular}{c c c}
+$A$ & $B$ & $C$ \\
+3 & 0 & 0 \\
+4 & 0 & 1 \\
+\end{tabular}
+
+After decomposition $R_1$ contains $(3, 0)$ and $(4, 0)$, and $R_2$ contains $(0, 0)$ and $(0, 1)$.
+Clearly the possible schema before the decomposition has another possibility: $(3, 0, 1)$ and $(4, 0, 0)$, implying it is impossible to recover the original schema.
+
+\section{Problem E}
+Given below is the set $\mathbf{F}$ of functional dependencies for the relational schema:
+$$R = \{A, B, C, D, E, F\}$$
+$$A \to BC$$
+$$BD \to E$$
+$$E \to F$$
+$$F \to D$$
+$$E \to D$$
+
+1. Is the set $\mathbf{F}$ a minimal cover? Explain the reason. If $\mathbf{F}$ is not minimal cover, find a minimal cover for $\mathbf{F}$.
+
+2. Based on the minimal cover for $\mathbf{F}$, produce a lossless BCNF decomposition for this schema. Is the result dependency-preserving? Explain why or why not.
+
+3. Based on the minimal cover for $\mathbf{F}$, produce a dependency preserving 3NF decomposition. Is the result redundancy free? Explain why or why not.
+
+\end{document}
