@@ -41,6 +41,14 @@ The following questions refer to the database schema below: Product(pid, price, 
 
 (b) Write a query in Tuple Relational Calculus and Domain Relational Calculus, to return the product with the highest price.
 
+{\bf Answer}: 
+\begin{itemize}
+\item Tuple Relational Calculus:
+$$\{t | t \in \texttt{Product} \wedge \forall s \in \texttt{Product} (s\texttt{[price]} \leq t\texttt{[price]})\}.$$
+\item Domain Relational Calculus:
+$$\{<i, p, c> | <i, p, c> \in \texttt{Product} \wedge \forall <i', p', c'> \in \texttt{Product} (p' \leq p)\}.$$
+\end{itemize}
+
 (c) Write an SQL query, to return the total quantity of products ordered by customers with age greater than 50.
 
 {\bf Answer}:
@@ -67,7 +75,7 @@ where pid in (
     from Order
     group by pid
   )
-  where QuantitySum in (
+  having SUM(quantity) in (
     select MAX(QuantitySum)
     from (
       select Sum(quantity) as QuantitySum
@@ -91,15 +99,26 @@ Answer the following queries using SQL and write its corresponding TRC if exists
 a) List the Office and Email of employee ``John Smith''.
 
 {\bf Answer}: 
+\begin{itemize}
+\item SQL:
 \begin{verbatim}
 select Office, Email
 from Employee
 where FirstName = 'John' and LastName = 'Smith';
 \end{verbatim}
 
+\item TRC:
+$$\begin{aligned}
+\{t | &\exists s \in \texttt{Employee} (s\texttt{[Office]} = t\texttt{[Office]} \wedge s\texttt{[Email]} = s\texttt{[Email]} \\
+&\wedge s\texttt{[FirstName]} = \texttt{'John'} \wedge s\texttt{[LastName]} = \texttt{'Smith'})\}.
+\end{aligned}$$
+\end{itemize}
+
 b) List the number of vacation Days taken by each employee with the name ``John Smith''.
 
 {\bf Answer}:
+\begin{itemize}
+\item SQL
 \begin{verbatim}
 select Days
 from Vacations
@@ -110,9 +129,20 @@ where EmployeeID in (
 );
 \end{verbatim}
 
+\item TRC:
+$$\begin{aligned}
+\{t | & \exists v \in \texttt{Vacations} (v\texttt{[Days]} = t\texttt{[Days]}
+ \wedge \exists e \in \texttt{Employee} (e\texttt{[EmployeeID]} = v\texttt{[EmployeeID]} \\
+&\wedge e\texttt{[FirstName]} = \texttt{'John'} \wedge e\texttt{[LastName]} = \texttt{'Smith'}))\}.
+\end{aligned}$$
+\end{itemize}
+
+
 c) List the FirstName and LastName of all employees who never took a vacation day.
 
 {\bf Answer}:
+\begin{itemize}
+\item SQL:
 \begin{verbatim}
 select FirstName, LastName
 from Employee
@@ -122,6 +152,14 @@ where EmployeeID in (
   where Days = 0;
 );
 \end{verbatim}
+
+\item TRC:
+$$\begin{aligned}
+\{t | & \exists s \in \texttt{Employee} (t\texttt{[FirstName]} = s\texttt{[FirstName]} \wedge t\texttt{[LastName]} = s\texttt{[LastName]}\\
+& \wedge \exists v \in \texttt{Vacations} (v\texttt{[EmployeeID]} = s\texttt{[EmployeeID]} 
+\wedge v\texttt{[Days]} = 0))\}.
+\end{aligned}$$
+\end{itemize}
 
 d) List the DepartmentName of every department whose total number of vacation days taken by its employees is the largest among those of all the departments.
 
@@ -137,7 +175,7 @@ where DepartmentID in (
     on Employee.EmployeeID = Vacations.EmployeeID
     group by DepartmentID
   )
-  where DaySum in (
+  having SUM(Days) in (
     select MAX(DaySum)
     from (
       select SUM(Days) as DaySum
@@ -154,7 +192,7 @@ We perform decomposition to normalize an original schema to be of certain normal
 
 (a) Is this decomposition always lossless? Answer yes or no and briefly explain why.
 
-{\bf Answer}: No. Suppose two tuples have the same value of $B$ but different values of $A$ and $C$. Then the decomposed tuples in $R_1$ and $R_2$ give 4 possible combinations, implying it is impossible to recover the original schema.
+{\bf Answer}: No. If there is a functional dependency $A \to BC$, then this dependency will be lost by such a decomposition. In particular, suppose two tuples have the same value of $B$ but different values of $A$ and $C$. Then the decomposed tuples in $R_1$ and $R_2$ give 4 possible combinations, implying it is impossible to recover the original schema.
 
 (b) Give an example instance of $R$ (i.e. an example table with several tuples) and demonstrate its decomposition, to support your answer in (a).
 
@@ -162,6 +200,7 @@ We perform decomposition to normalize an original schema to be of certain normal
 
 \begin{tabular}{c c c}
 $A$ & $B$ & $C$ \\
+\hline
 3 & 0 & 0 \\
 4 & 0 & 1 \\
 \end{tabular}
@@ -180,8 +219,85 @@ $$E \to D$$
 
 1. Is the set $\mathbf{F}$ a minimal cover? Explain the reason. If $\mathbf{F}$ is not minimal cover, find a minimal cover for $\mathbf{F}$.
 
+{\bf Answer}: No, $\mathbf{F}$ is not a minimal cover, since the dependency $E \to D$, which can be inferred by $E \to F$ and $F \to D$, is redundant.
+
+By removing the redundant dependency we have the minimal cover as follows:
+$$A \to BC$$
+$$BD \to E$$
+$$E \to F$$
+$$F \to D$$
+
 2. Based on the minimal cover for $\mathbf{F}$, produce a lossless BCNF decomposition for this schema. Is the result dependency-preserving? Explain why or why not.
 
+{\bf Answer}: A lossless BCNF decomposition can be
+$$R_1 (A, B, C)$$
+$$R_2 (E, F)$$
+$$R_3 (F, D)$$
+The BCNF above does not preserve the dependency $BD \to E$.
+
 3. Based on the minimal cover for $\mathbf{F}$, produce a dependency preserving 3NF decomposition. Is the result redundancy free? Explain why or why not.
+
+{\bf Answer}: A 3-NF decomposition can be
+$$R_1 (A, B, C)$$
+$$R_2 (B, D, E)$$
+$$R_3 (E, F)$$
+$$R_4 (F, D)$$
+It contains redundancy of attribute $D$, which appears in both $R_2$ and $R_4$.
+
+\section{Problem F}
+1. Consider the relation Treatment and FDs below. Describe, with examples, two potential issues that can arise with this design.
+\begin{itemize}
+\item Treatment(doctorID, doctorName, patientID, diagnosis)
+\item doctorID $\to$ doctorName
+\item doctorID, patientID $\to$ diagnosis
+\end{itemize}
+
+{\bf Answer}: 
+\begin{itemize}
+\item A doctor may have many patients (e.g., 100 per month), then there are many repeated doctorName in the table, giving too much redundancy.
+\item If one needs to update doctorName, it can easily give inconsistency to this table. If in the table of doctors, the doctorName is changed, then every doctorName in this table has to be updated as well. 
+\end{itemize}
+
+2. Prove that every two-attribute relation is in BCNF.
+
+3. Prove that if relation $R$ is in 3NF and every key is simple (i.e., a single attribute), then $R$ is in BCNF.
+
+\section{Problem H}
+There are two common methodologies (not specific techniques) to learn compact and meaningful word embeddings. List them and briefly describe the main idea.
+
+\section{Problem I}
+(a) Given a query $q$ and a set of documents $d_1$, $d_2$, $\cdots$, $d_m$, use the vector space model to show how to rank documents. Assume $q$ and $d_i$ are sets of words.
+
+(b) Describe the intuition behind text length normalization and write down a normalization formula.
+
+(c) Describe the intuition behind language model smoothing and write down a smoothing function.
+
+\section{Problem J}
+(a) Write down the objective function of $K$-means.
+
+(b) Assume you have $n$ $d$-dimension vectors, write down the code of $K$-means to cluster these $n$ vectors to $K$ groups.
+
+(c) Explain three methods to measure the distance between two clusters for numerical data.
+
+\section{Problem K}
+Explain the connection and difference between two link-based ranking models: HITS and PAGERANK, and write down their formula.
+
+\section{Problem L}
+In order to build a knowledge graph from a large text repository, we need to perform several tasks including entity extraction. Could you please describe these tasks and their connections?
+
+\section{Problem M}
+Describe the basic steps of RandomForest.
+
+\section{Problem N}
+Explain how to cluster the following dataset.
+
+\section{Problem O (Bonus Problem)}
+Assume Facebook uses relational database technology to record its user information and user friendship information. It has two large tables (UserId, Gender), (USerId1, UserId2).
+
+1. Writing a SQL query to list all of distinct 2-hop female friends of user ``Mary''.
+
+2. Writing a SQL query to find the user who has the maximal number of 2-hop friends.
+
+3. Propose a query that could not be easily expressed by SQL. Please explain why.
 
 \end{document}
