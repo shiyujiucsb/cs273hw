@@ -230,18 +230,19 @@ $$F \to D$$
 2. Based on the minimal cover for $\mathbf{F}$, produce a lossless BCNF decomposition for this schema. Is the result dependency-preserving? Explain why or why not.
 
 {\bf Answer}: A lossless BCNF decomposition can be
-$$R_1 (A, B, C)$$
-$$R_2 (E, F)$$
-$$R_3 (F, D)$$
+$$R_1 (\underline{A}, B, C)$$
+$$R_2 (\underline{E}, F)$$
+$$R_3 (\underline{F}, D)$$
+$$R_4 (\underline{A, E})$$
 The BCNF above does not preserve the dependency $BD \to E$.
 
 3. Based on the minimal cover for $\mathbf{F}$, produce a dependency preserving 3NF decomposition. Is the result redundancy free? Explain why or why not.
 
 {\bf Answer}: A 3-NF decomposition can be
-$$R_1 (A, B, C)$$
-$$R_2 (B, D, E)$$
-$$R_3 (E, F)$$
-$$R_4 (F, D)$$
+$$R_1 (\underline{A}, B, C)$$
+$$R_2 (\underline{B, D}, E)$$
+$$R_3 (\underline{E}, F)$$
+$$R_4 (\underline{F}, D)$$
 It contains redundancy of attribute $D$, which appears in both $R_2$ and $R_4$.
 
 \section{Problem F}
@@ -259,11 +260,33 @@ It contains redundancy of attribute $D$, which appears in both $R_2$ and $R_4$.
 \end{itemize}
 
 2. Prove that every two-attribute relation is in BCNF.
+\begin{proof}
+For any two-attribute relation $R(A, B)$, we have
+\begin{itemize}
+\item If without loss of generality $A$ is the primary key, then $A \to B$ is the only non-trivial dependency. 
+\item If $A$ and $B$ together form the primary key, then every dependency is trivial.
+\end{itemize}
+For either case the condition of BCNF is satisfied.
+\end{proof}
 
 3. Prove that if relation $R$ is in 3NF and every key is simple (i.e., a single attribute), then $R$ is in BCNF.
+\begin{proof}
+Without loss of generality in any 3NF $R(A_0, \cdots, A_n)$ every non-trivial dependency $A_i \cdots A_j \to A_k$, we have two cases:
+\begin{itemize}
+\item $A_i \cdots A_j$ is a superkey, or
+\item $A_k$ is in some key. Since every key in $R$ is simple, $A_k$ must be a key and thus a superkey.
+\end{itemize}
+Either case preserves the condition of BCNF.
+\end{proof}
 
 \section{Problem H}
 There are two common methodologies (not specific techniques) to learn compact and meaningful word embeddings. List them and briefly describe the main idea.
+
+{\bf Answer}:
+\begin{itemize}
+\item Global co-occurrence statistics. The idea is to count the co-occurrences throughout the full documents, i.e., to compute the word-doc occurrence matrix for all the words in the same document.
+\item Prediction in local windows. The idea is to count the co-occurrences in a local window, which contains the words within a certain distance.
+\end{itemize}
 
 \section{Problem I}
 (a) Given a query $q$ and a set of documents $d_1$, $d_2$, $\cdots$, $d_m$, use the vector space model to show how to rank documents. Assume $q$ and $d_i$ are sets of words.
