@@ -349,8 +349,33 @@ where $c_j$ is the average (centroid) of the cluster $j$. $C(i) = j$ denotes all
 
 (c) Explain three methods to measure the distance between two clusters for numerical data.
 
+{\bf Answer}:
+\begin{itemize}
+\item Single link: smallest distance between an element in one cluster and an element in the other.
+\item Complete link: largest distance between an element in one cluster and an element in the other.
+\item Average: the averaged distance between an element in one cluster and an element in the other.
+\item Centroid/Medoid: the distance between the centroids/medoids of the two clusters.
+\end{itemize}
+
 \section{Problem K}
-Explain the connection and difference between two link-based ranking models: HITS and PAGERANK, and write down their formula.
+Explain the connection and difference between two link-based ranking models: HITS and PageRank, and write down their formula.
+
+{\bf Answer}:
+Both the algorithms aim to find the authority webpages given the query. They both use the link model, i.e., hyperlinks can infer the notion of authority, and good authorities are often cited by many pages. Both the algorithms use iterative algorithms to reach the scores for ranking.
+
+One of the major differences between HITS and PageRank is that HITS depends on the query, i.e., it needs to recompute all the scores per query, which could be computational expensive. Hence for efficiency HITS needs to know the small subset of relevant pages per query beforehand. Otherwise to deal with the entire webpages for each query is too expensive for web search. Also HITS maintains two scores (for hub and authority respectively) for each page, whereas PageRank has only one score. 
+
+The equations used by the algorithms are given as follows.
+\begin{itemize}
+\item HITS:
+$$a(p) := \sum_{i=1}^n h(i).$$
+$$h(p) := \sum_{i=1}^n a(i).$$
+Here we have $n$ pages. $a(i)$ denotes the authority score of page $i$, and $h(i)$ denotes the hub score of page $i$.
+
+\item PageRank:
+$$R(p) := c \sum_{q: q \to p} \frac{R(q)}{N_q},$$
+where $N_q$ is the total number of out-links from page $q$. $c$ is a normalizing constant set so that the ranks of all pages sum to 1. $R(q)$ denotes the PageRank score of page $p$.
+\end{itemize}
 
 \section{Problem L}
 In order to build a knowledge graph from a large text repository, we need to perform several tasks including entity extraction. Could you please describe these tasks and their connections?
@@ -358,8 +383,16 @@ In order to build a knowledge graph from a large text repository, we need to per
 \section{Problem M}
 Describe the basic steps of RandomForest.
 
+{\bf Answer}:
+In the training phase, we build $B$ decision trees as follows. To build each tree, we sample $n$ examples from the training dataset $X$, $Y$, and then use these sampled $n$ examples to train a decision tree.
+
+In the classification phase we use the $B$ trees to predict and take the majority vote among them as the result.
+
 \section{Problem N}
-Explain how to cluster the following dataset.
+Explain how to cluster the following dataset. In a 2D plane, a group of points surround the other group of points.
+
+{\bf Answer}:
+We may use support vector machine with kernel method, i.e., to project these 2D points into some higher dimensional space and use linear SVM to do the classification, satisfying that the projection preserves the distance (or equivalents the dot product) between points. Clearly it is not appropriate linear SVM since in nature the dataset has VC dimension larger than 2.
 
 \section{Problem O (Bonus Problem)}
 Assume Facebook uses relational database technology to record its user information and user friendship information. It has two large tables (UserId, Gender), (USerId1, UserId2).
