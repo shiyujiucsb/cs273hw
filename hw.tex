@@ -284,21 +284,68 @@ There are two common methodologies (not specific techniques) to learn compact an
 
 {\bf Answer}:
 \begin{itemize}
-\item Global co-occurrence statistics. The idea is to count the co-occurrences throughout the full documents, i.e., to compute the word-doc occurrence matrix for all the words in the same document.
-\item Prediction in local windows. The idea is to count the co-occurrences in a local window, which contains the words within a certain distance.
+\item Dimensionality reduction on the word-word co-occurrence matrix. The main idea is to first find the global co-occurrence matrix and then store most of the important information in a fixed small number of dimensions, like a dense vector.
+\item Directly learn low-dimensional word vectors. The main idea is instead of capturing global co-occurrence counts directly, we sequentially scan local windows and do prediction. We can incorporate a new sentence/document, or add a word to the vocabulary.
 \end{itemize}
 
 \section{Problem I}
 (a) Given a query $q$ and a set of documents $d_1$, $d_2$, $\cdots$, $d_m$, use the vector space model to show how to rank documents. Assume $q$ and $d_i$ are sets of words.
 
+{\bf Answer}:
+In the vector space model, we represent each document and query as a vector in the space. Each term defines one dimension, and thus $n$ terms define a $n$-dimensional space. We rank the documents by their relevance with the query. We measure the relevance by the distance between the query vector and the document vector, e.g., the dot product between the vectors can be treated as the cosine similarity.
+
 (b) Describe the intuition behind text length normalization and write down a normalization formula.
 
+{\bf Answer}:
+The intuition behind text length normalization is that the documents have different lengths, and many repeated occurrences in one document is much less informative than the first occurrence of the same word. Document length normalization is used to remove the chance that very long documents are more likely to be retrieved than the short ones, i.e., long documents usually have more terms and higher term frequencies, both of which may increase query-document similarity.
+
+We can use the privoted normalization: let $|d_i|$ be the length of the document $d_i$. Then the normalization
+$$PN_i : = 1- b + b\frac{|d_i|}{\sum_{j=1}^m |d_j|},$$
+where $b$ ranges from 0 to 1. If the length $|d_i|$ is the old normalization of $d_i$, then $PN_i$ is the new normalization. 
+
 (c) Describe the intuition behind language model smoothing and write down a smoothing function.
+
+{\bf Answer}: 
+In language model we treat each document as a sample drawn from a word distribution, and our goal is to learn the word distribution based on the given documents. A natural question is how to give the probability of a word which does not appear in the given document. If we assign some non-zero probability to these words, then the probabilities assigned to the words already in this document shall be discounted appropriately. This is basically the objective of the smoothing technique.
+
+Simplified Jelinek-Mercer Smoothing:
+$$p(w | d) := (1-\lambda) p_{ml}(w | d) + \lambda p(w | C),$$
+where $p(w | C)$ is roughly TF-IDF of $w$ plus the length norm of $w$. $p_{ml}(w | d)$ is the frequency of $w$ in $d$. $\lambda$ is between 0 and 1.
 
 \section{Problem J}
 (a) Write down the objective function of $K$-means.
 
+{\bf Answer}:
+Suppose we use $K$-means to divide $n$ vectors $x_i$ into $K$ clusters. Then the objective function shall be
+$$J := \sum_{j=1} ^K \sum_{C(i) = j} ||x_i - c_j||^2,$$
+where $c_j$ is the average (centroid) of the cluster $j$. $C(i) = j$ denotes all the vectors $i$ that are grouped into cluster $j$. Our objective is to minimize $J$.
+
 (b) Assume you have $n$ $d$-dimension vectors, write down the code of $K$-means to cluster these $n$ vectors to $K$ groups.
+
+{\bf Answer}: Below is the pseudocode for $K$-means.
+\begin{quote}
+\centering
+\begin{algorithmic}
+\State Randomly partition the $n$ vectors into $K$ clusters: $C_1$, $\cdots$, $C_K$.
+\State $flag \gets true$
+\While {$flag$ is true}
+  \State $flag \gets false$
+  \For {each cluster $C_i$}
+    \State Compute the average $c_i \gets \frac{1}{|C_i|}\sum_{k\in C_i} x_k$.
+  \EndFor
+  \For {each $x_i$}
+    \State Set $c$ as the centroid of the cluster containing $x_i$
+    \For {each $c_j$}
+      \If {$|| x_i, c_j || < || x_i, c ||$}
+        \State $c \gets c_j$
+        \State $flag \gets true$
+      \EndIf
+    \EndFor
+    \State  Set the cluster of vector $x_i$ as the one with centroid $c$
+  \EndFor
+\EndWhile
+\end{algorithmic}
+\end{quote}
 
 (c) Explain three methods to measure the distance between two clusters for numerical data.
 
