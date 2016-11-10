@@ -395,12 +395,55 @@ Explain how to cluster the following dataset. In a 2D plane, a group of points s
 We may use support vector machine with kernel method, i.e., to project these 2D points into some higher dimensional space and use linear SVM to do the classification, satisfying that the projection preserves the distance (or equivalents the dot product) between points. Clearly it is not appropriate linear SVM since in nature the dataset has VC dimension larger than 2.
 
 \section{Problem O (Bonus Problem)}
-Assume Facebook uses relational database technology to record its user information and user friendship information. It has two large tables (UserId, Gender), (USerId1, UserId2).
+Assume Facebook uses relational database technology to record its user information and user friendship information. It has two large tables (UserId, Gender), (UserId1, UserId2).
+
+Denote the tables as
+\begin{itemize}
+\item User(\underline{UserId}, Gender)
+\item Friend(\underline{UserId1, UserId2})
+\end{itemize}
 
 1. Writing a SQL query to list all of distinct 2-hop female friends of user ``Mary''.
 
+{\bf Answer}:
+\begin{verbatim}
+select *
+from User
+where UserId in (
+  select UserId2
+  from Friend
+  where UserId1 in (
+	  select UserId2
+    from Friend
+    where UserId1 = 'Mary'
+  )
+)
+\end{verbatim}
+
 2. Writing a SQL query to find the user who has the maximal number of 2-hop friends.
 
+{\bf Answer}:
+\begin{verbatim}
+select A.UserId1, COUNT(B.UserId2) as N
+from Friend A, Friend B
+where A.UserId2 = B.UserId1
+group by A.UserId1
+having N in (
+  select MAX(N)
+  from (
+    select A.UserId1, COUNT(B.UserId2) as N
+    from Friend A, Friend B
+    where A.UserId2 = B.UserId1
+    group by A.UserId1
+  )
+)
+\end{verbatim}
+
 3. Propose a query that could not be easily expressed by SQL. Please explain why.
+
+{\bf Answer}:
+Such a query can be to find the user who has the maximal number of $k$-hop friends, where $k$ is given in the query.
+
+The reason of difficulty is that the number of tables to join depends on $k$, which is dynamic. It is impossible to fix the SQL code without the knowledge of $k$.
 
 \end{document}
