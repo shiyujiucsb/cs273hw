@@ -28,22 +28,30 @@ If you do not have sufficient information, please state your assumptions clearly
 
 (a) Draw an ER diagram for this application. Be sure to mark the multiplicity of each relationship of the diagram. Decide the key attributes and identify them on the diagram.
 
+{\bf Answer}:
+The ER diagram is given as follows.
+\begin{quote}
+\centering
+\includegraphics[width=.8\textwidth]{er.eps}
+\end{quote}
+
 (b) Convert the above ER diagram into a relational schema. Merge relations where appropriate. Your solution should have as few relations as possible, but they do not need to be normalized. Specify the key of each relation in your schema.
 
 {\bf Answer}: The relational schema is given as follows.
 \begin{itemize}
-\item Book(\underline{Name, VersionID}, Publisher, Year, Date, Authors)]
-\item Rate(\underline{UserID, VersionID, BookName}, password, date, rate)
+\item Book(\underline{name, versionID}, publisher, year, date, authors)]
+\item Rate(\underline{userID, versionID, bookName}, date, rate)
+\item Viewer(\underline{userID}, password)
 \end{itemize}
 
 (c) Write a 3NF for the derived relational schema.
 
 {\bf Answer}: A 3NF of the schema above is given as follows.
 \begin{itemize}
-\item Book(\underline{Name}, Publisher)
-\item Version(\underline{VersionID, BookName}, Year, Date, Authors)
-\item Rate(\underline{ViewerID, VersionID, BookName}, date, rate)
-\item Viewer(\underline{UserID}, password)
+\item Book(\underline{name}, publisher)
+\item Version(\underline{versionID, bookName}, year, date, authors)
+\item Rate(\underline{userID, versionID, bookName}, date, rate)
+\item Viewer(\underline{userID}, password)
 \end{itemize}
 
 \section{Problem B}
