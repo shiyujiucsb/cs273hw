@@ -28,9 +28,23 @@ If you do not have sufficient information, please state your assumptions clearly
 
 (a) Draw an ER diagram for this application. Be sure to mark the multiplicity of each relationship of the diagram. Decide the key attributes and identify them on the diagram.
 
-(b) Convert the above ER diagram into a relational schema. Merge relations where appropriate. Your solution should have as few relations as possible, but they do not need to be normalized. Specify they key of each relation in your schema.
+(b) Convert the above ER diagram into a relational schema. Merge relations where appropriate. Your solution should have as few relations as possible, but they do not need to be normalized. Specify the key of each relation in your schema.
+
+{\bf Answer}: The relational schema is given as follows.
+\begin{itemize}
+\item Book(\underline{Name, VersionID}, Publisher, Year, Date, Authors)]
+\item Rate(\underline{UserID, VersionID, BookName}, password, date, rate)
+\end{itemize}
 
 (c) Write a 3NF for the derived relational schema.
+
+{\bf Answer}: A 3NF of the schema above is given as follows.
+\begin{itemize}
+\item Book(\underline{Name}, Publisher)
+\item Version(\underline{VersionID, BookName}, Year, Date, Authors)
+\item Rate(\underline{ViewerID, VersionID, BookName}, date, rate)
+\item Viewer(\underline{UserID}, password)
+\end{itemize}
 
 \section{Problem B}
 The following questions refer to the database schema below: Product(pid, price, color), Order(cid, pid, quantity), Customer(cid, name, age).
@@ -379,6 +393,15 @@ where $N_q$ is the total number of out-links from page $q$. $c$ is a normalizing
 
 \section{Problem L}
 In order to build a knowledge graph from a large text repository, we need to perform several tasks including entity extraction. Could you please describe these tasks and their connections?
+
+{\bf Answer}:
+The major tasks are given as follows:
+\begin{itemize}
+\item Entity Extraction. We use Named Entity Recognition to find and classify named entities in the unstructured text.
+\item Triple Identification. Given the entities recognized by Entity Extraction, we try to find (subject, predicate, object) triples throughout the text. We first identify predicate phrases, and then find subjects and objects. Finally we evaluate the confidence score by using logistic regression classifier.
+\item Entity Linkage. We associate an entity given by Entity Extraction to an entry in a knowledge base or expert system (e.g. Wikipedia). For each entity we may generate and rank candidates with the help of the knowledge base.
+\item Predicate Linkage. Given the results from Triple Identification, we find synonymous predicates by using unsupervised method.
+\end{itemize}
 
 \section{Problem M}
 Describe the basic steps of RandomForest.
