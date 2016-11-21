@@ -97,7 +97,7 @@ where pid in (
     from Order
     group by pid
   )
-  having SUM(quantity) in (
+  where SUM(quantity) in (
     select MAX(QuantitySum)
     from (
       select Sum(quantity) as QuantitySum
@@ -214,7 +214,7 @@ We perform decomposition to normalize an original schema to be of certain normal
 
 (a) Is this decomposition always lossless? Answer yes or no and briefly explain why.
 
-{\bf Answer}: No. If there is a functional dependency $A \to BC$, then this dependency will be lost by such a decomposition. In particular, suppose two tuples have the same value of $B$ but different values of $A$ and $C$. Then the decomposed tuples in $R_1$ and $R_2$ give 4 possible combinations, implying it is impossible to recover the original schema.
+{\bf Answer}: No. If there is a functional dependency $A \to BC$, then this dependency will be lost by such a decomposition. In particular, suppose two tuples have the same value of $B$ but different values of $A$ and $C$. Then the decomposed tuples in $R_1$ and $R_2$ give 4 possible combinations, implying it is impossible to recover the original schema. Moreover, the natural join of $R_1$ and $R_2$ does \emph{not} equal to the origianl relation $R$, implying there is loss of information.
 
 (b) Give an example instance of $R$ (i.e. an example table with several tuples) and demonstrate its decomposition, to support your answer in (a).
 
@@ -279,6 +279,8 @@ It contains redundancy of attribute $D$, which appears in both $R_2$ and $R_4$.
 \begin{itemize}
 \item A doctor may have many patients (e.g., 100 per month), then there are many repeated doctorName in the table, giving too much redundancy.
 \item If one needs to update doctorName, it can easily give inconsistency to this table. If in the table of doctors, the doctorName is changed, then every doctorName in this table has to be updated as well. 
+\item We cannot record the name of a doctor given the ID, if this doctor does not have a patient yet.
+\item If all the patients of a doctor are deleted from the database, then the record (even including the name and ID) of this doctor will be removed as well.
 \end{itemize}
 
 2. Prove that every two-attribute relation is in BCNF.
