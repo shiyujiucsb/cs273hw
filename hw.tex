@@ -131,7 +131,7 @@ where FirstName = 'John' and LastName = 'Smith';
 
 \item TRC:
 $$\begin{aligned}
-\{t | &\exists s \in \texttt{Employee} (s\texttt{[Office]} = t\texttt{[Office]} \wedge s\texttt{[Email]} = s\texttt{[Email]} \\
+\{t | &\exists s \in \texttt{Employee} (s\texttt{[Office]} = t\texttt{[Office]} \wedge s\texttt{[Email]} = t\texttt{[Email]} \\
 &\wedge s\texttt{[FirstName]} = \texttt{'John'} \wedge s\texttt{[LastName]} = \texttt{'Smith'})\}.
 \end{aligned}$$
 \end{itemize}
@@ -164,6 +164,7 @@ c) List the FirstName and LastName of all employees who never took a vacation da
 
 {\bf Answer}:
 \begin{itemize}
+\item \emph{Assumption}: We assume the table Vacations contains the vacation days for \emph{every} employee, i.e., if one employee did not request a vacation, the Days shall be 0.
 \item SQL:
 \begin{verbatim}
 select FirstName, LastName
