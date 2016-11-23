@@ -244,7 +244,8 @@ $$E \to D$$
 {\bf Answer}: No, $\mathbf{F}$ is not a minimal cover, since the dependency $E \to D$, which can be inferred by $E \to F$ and $F \to D$, is redundant.
 
 By removing the redundant dependency we have the minimal cover as follows:
-$$A \to BC$$
+$$A \to B$$
+$$A \to C$$
 $$BD \to E$$
 $$E \to F$$
 $$F \to D$$
@@ -265,7 +266,8 @@ $$R_1 (\underline{A}, B, C)$$
 $$R_2 (\underline{B, D}, E)$$
 $$R_3 (\underline{E}, F)$$
 $$R_4 (\underline{F}, D)$$
-It contains redundancy of attribute $D$, which appears in both $R_2$ and $R_4$.
+$$R_5 (\underline{A, D})$$
+It contains redundancy of attribute $D$, which appears in $R_2$ and $R_5$, i.e., one $D$ value may have different $A$'s, and it has to repeat for the number of $A$'s that appear with this $D$ value. 
 
 \section{Problem F}
 1. Consider the relation Treatment and FDs below. Describe, with examples, two potential issues that can arise with this design.
